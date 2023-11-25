@@ -1,0 +1,32 @@
+name: Manual Web Scraping
+
+on:
+  workflow_dispatch:
+    inputs:
+      url: # Add any other input parameters as needed
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run scraping script
+        run: node scrape.js
+        env:
+          BASE_URL: ${{ github.event.inputs.url }}
+
+      - name: Save data as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: scraped-data
+          path: path/to/your/scraped-data
