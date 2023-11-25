@@ -26,38 +26,40 @@ async function scrapeData(url, cssSelector) {
 // Original code to extract links
 const baseUrl = "https://geizhals.de/?cat=gra16_512&v=e&hloc=at&hloc=de&t=v&sort=p&bl1_id=30";
 
-try {
-    const response = await axios.get(baseUrl);
-    if (response.status === 200) {
-        const $ = cheerio.load(response.data);
-        const linkElements = $('tr.xf_tr:nth-child(4) > td:nth-child(3) a');
-        const extractedLinks = linkElements
-            .filter((index, element) => !element.attribs.href.includes("NVIDIA+alt")
-                && !element.attribs.href.includes("AMD+alt")
-                && !element.attribs.href.includes("Professional")
-                && !element.attribs.href.includes("Matrox")
-                && !element.attribs.href.includes("Intel"))
-            .map((index, element) => element.attribs.href.slice(2))
-            .get();
+(async () => {
+    try {
+        const response = await axios.get(baseUrl);
+        if (response.status === 200) {
+            const $ = cheerio.load(response.data);
+            const linkElements = $('tr.xf_tr:nth-child(4) > td:nth-child(3) a');
+            const extractedLinks = linkElements
+                .filter((index, element) => !element.attribs.href.includes("NVIDIA+alt")
+                    && !element.attribs.href.includes("AMD+alt")
+                    && !element.attribs.href.includes("Professional")
+                    && !element.attribs.href.includes("Matrox")
+                    && !element.attribs.href.includes("Intel"))
+                .map((index, element) => element.attribs.href.slice(2))
+                .get();
 
-        // CSS selector to extract data
-        const cssSelector = "#product0 > div:nth-child(8) > span:nth-child(1) > span:nth-child(1)";
+            // CSS selector to extract data
+            const cssSelector = "#product0 > div:nth-child(8) > span:nth-child(1) > span:nth-child(1)";
 
-        // Loop through each URL and scrape data with a 5-second delay
-        for (const urlFragment of extractedLinks) {
-            const fullUrl = `https://geizhals.de/${urlFragment}`;
-            console.log(`Scraping data from: ${fullUrl}`);
-            
-            await scrapeData(fullUrl, cssSelector);
+            // Loop through each URL and scrape data with a 5-second delay
+            for (const urlFragment of extractedLinks) {
+                const fullUrl = `https://geizhals.de/${urlFragment}`;
+                console.log(`Scraping data from: ${fullUrl}`);
+                
+                await scrapeData(fullUrl, cssSelector);
 
-            // Add a 5-second delay
-            await sleep(5000);
+                // Add a 5-second delay
+                await sleep(5000);
 
-            console.log("\n".padEnd(50, "=") + "\n");
+                console.log("\n".padEnd(50, "=") + "\n");
+            }
+        } else {
+            console.log(`Failed to retrieve the page. Status code: ${response.status}`);
         }
-    } else {
-        console.log(`Failed to retrieve the page. Status code: ${response.status}`);
+    } catch (error) {
+        console.error(`An error occurred: ${error.message}`);
     }
-} catch (error) {
-    console.error(`An error occurred: ${error.message}`);
-}
+})();
