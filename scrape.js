@@ -26,7 +26,7 @@ async function scrapeData(url, cssSelector) {
 // Original code to extract links
 const baseUrl = "https://geizhals.de/?cat=gra16_512&v=e&hloc=at&hloc=de&t=v&sort=p&bl1_id=30";
 
-(async () => {
+async function main() {
     try {
         const response = await axios.get(baseUrl);
         if (response.status === 200) {
@@ -62,4 +62,7 @@ const baseUrl = "https://geizhals.de/?cat=gra16_512&v=e&hloc=at&hloc=de&t=v&sort
     } catch (error) {
         console.error(`An error occurred: ${error.message}`);
     }
-})();
+}
+
+// Call the main function
+main();
